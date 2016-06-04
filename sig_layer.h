@@ -14,7 +14,7 @@ private:
 		return activation_fn(a) * (1.0 - activation_fn(a));
 	}
 public:
-	sig_layer(int nn, int ni) : linear_layer(nn, ni) { }
+	sig_layer(int nn, int ni, int bias = 1) : linear_layer(nn, ni, bias) { }
 
 	matrix* derivative_by_input(double *input) {
 		return nullptr;

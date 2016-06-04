@@ -69,9 +69,7 @@ public:
 	}
 
 	void print() {		//samo za testiranje (obrisati u finalnoj verziji)
-		std::cout << "broj neurona: " << nn << std::endl;
-		std::cout << "broj ulaza: " << ni << std::endl;
-		std::cout << "bias: " << bias << std::endl;
+		std::cout << "---------------------------------\n";
 		std::cout << weights;
 	}
 

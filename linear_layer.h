@@ -12,7 +12,7 @@ private:
 		return 1.0;
 	}
 public:
-	linear_layer(int nn, int ni) : layer(nn, ni, 1) { }
+	linear_layer(int nn, int ni, int bias = 1) : layer(nn, ni, bias) { }
 
 	matrix* derivative_by_input(double *input) {
 		return nullptr;

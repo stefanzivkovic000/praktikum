@@ -12,7 +12,7 @@ private:
 		return 1.0 - activation_fn(a) * activation_fn(a);
 	}
 public:
-	tanhip_layer(int nn, int ni) : linear_layer(nn, ni) { }
+	tanhip_layer(int nn, int ni, int bias) : linear_layer(nn, ni, bias) { }
 
 	matrix* derivative_by_input(double *input) {
 		return nullptr;
