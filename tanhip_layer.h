@@ -12,13 +12,6 @@ private:
 		return 1.0 - activation_fn(a) * activation_fn(a);
 	}
 public:
-	tanhip_layer(int nn, int ni, int bias) : linear_layer(nn, ni, bias) { }
-
-	matrix* derivative_by_input(double *input) {
-		return nullptr;
-	}
-
-	matrix* derivative_by_weights() {
-		return nullptr;
-	}
+	tanhip_layer(int nn, int ni, int bias, double* weights, double* deltas, int my_index) :
+		linear_layer(nn, ni, bias, weights, deltas, my_index) { }
 };

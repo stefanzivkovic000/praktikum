@@ -12,13 +12,6 @@ private:
 		return 1.0;
 	}
 public:
-	linear_layer(int nn, int ni, int bias = 1) : layer(nn, ni, bias) { }
-
-	matrix* derivative_by_input(double *input) {
-		return nullptr;
-	}
-
-	matrix* derivative_by_weights() {
-		return nullptr;
-	}
+	linear_layer(int nn, int ni, int bias, double* weights, double* deltas, int my_index) :
+		layer(nn, ni, bias, weights, deltas, my_index) { }
 };
