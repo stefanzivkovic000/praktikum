@@ -1,10 +1,10 @@
 #pragma once
 
-#include "matrix.h"
+#include <iostream>
 
 class layer {
 protected:
-	int my_index;	//indeks sloja u mrezi
+	int my_index;		//indeks sloja u mrezi - skriveni sloj - 0, izlazni sloj - 1
 	int nn;			//broj neurona u sloju
 	int ni;			//broj ulaza
 	int bias;		//1 ako ima bias, 0 inace								
@@ -12,7 +12,7 @@ protected:
 	double* potentials;
 	double* output;
 	double* deltas;
-	virtual double activation_fn(double a) = 0;				//a je potencijal
+	virtual double activation_fn(double a) = 0;			//a je potencijal
 	virtual double activation_fn_prime(double a) = 0;		//a je potencijal
 public:
 	layer(int nn, int ni, int bias, double* weights, double* deltas, int my_index) {
@@ -36,7 +36,7 @@ public:
 		for (int i = 0; i < nn; i++) {
 			potentials[i] = (bias) ? 1 * weights[i * (ni + 1)] : 0.0;
 			for (int j = 0; j < ni; j++) {
-				potentials[i] += input[j] * weights[i * (ni + 1) + j];
+				potentials[i] += input[j] * weights[i * (ni + 1) + j + 1];
 			}
 		}
 

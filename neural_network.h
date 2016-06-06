@@ -14,8 +14,8 @@ class neural_network {
 protected:					
 	H *hidden_layer;
 	O *output_layer;
-	double* weights;				//tezine cele mreze
-	double* output;
+	double* weights;				//tezine za celu mrezu
+	double* output;	
 	double* deltas;
 public:
 	neural_network(int in_num, int hl_num, int ol_num = 1) {
