@@ -1,6 +1,10 @@
 #pragma once
 
 #include <iostream>
+class layer;
+extern int nLayers;
+extern layer** layers;
+const double eta = 0.9;
 
 class layer {
 protected:
@@ -11,16 +15,28 @@ protected:
 	double* weights;
 	double* potentials;
 	double* output;
+	double* inputs; //dodao zbog backProp
 	double* deltas;
 	virtual double activation_fn(double a) = 0;			//a je potencijal
+	virtual double activation_fn_inverse(double x) = 0;
 	virtual double activation_fn_prime(double a) = 0;		//a je potencijal
+	double costFunction(double x, double y) { //mse
+		return (x - y)*(x - y);
+	}
+	double costFunctionPrime(double x, double y) {
+		return -2.0 * (x - y);
+	}
+	
 public:
+	virtual double d_ai_xj(int i, int j, double x) = 0;
+	virtual double d_ai_wij(int j) = 0;
 	layer(int nn, int ni, int bias, double* weights, double* deltas, int my_index) {
 		
 		this -> nn = nn;
 		this -> ni = ni;
 		this -> bias = bias;
 		this -> weights = weights;
+		this->deltas = deltas;
 		this -> output = new double[nn];
 		this -> my_index = my_index;
 
@@ -29,9 +45,14 @@ public:
 	}
 	~layer() {
 		delete [] potentials;
+		delete[] inputs;
 		delete [] output;
 	}
-	void compute_potentials(double *input) {			
+	void compute_potentials(double *input) {		
+		inputs = new double[ni + 1];
+		for (int i = 0; i < ni + 1; i++)
+			inputs[i] = input[i]; //kopiram jer ne znam sto ne radi xD
+
 
 		for (int i = 0; i < nn; i++) {
 			potentials[i] = (bias) ? 1 * weights[i * (ni + 1)] : 0.0;
@@ -53,14 +74,29 @@ public:
 
 	}
 
-	void update_weights(double *new_weights) {
+	/*void update_weights(double *new_weights) {
 		int to = (ni + 1) * nn;
 		for (int i = 0; i < to; i++) 
 			weights[i] = new_weights[i];
+	}*/
+	void update_weights() {
+		for (int i = 0; i < nn; i++)
+			for (int j = 0; j < ni + 1; j++)
+				weights[i*(ni + 1) + j] -= eta * deltas[i] * this->d_ai_wij(j);
 	}
 
 	int get_nn() {
 		return nn;
+	}
+    void compute_deltas(double y=0) { //cisto onako =0, da poziv za skriveni sloj ne bi imao args
+		if (my_index == nLayers - 1) {
+			deltas[0] = costFunctionPrime(y, output[0])*this->activation_fn_prime(potentials[0]);
+		}
+		else {
+			for (int i = 0; i < nn; i++) {
+				deltas[i] = deltas[nn] * layers[my_index+1]->d_ai_xj(0,i,output[i])*this->activation_fn_prime(potentials[i]); //
+			} // drugacija bi petlja bila da ima vise od 2 sloja (imali bi 2)
+		}
 	}
 
 	int get_ni() {
