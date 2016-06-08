@@ -10,6 +10,8 @@ const double min_ran = -0.1;
 const double max_ran = 0.1;
 int nLayers = 2;
 layer** layers;
+//const double learning_rate = 0.01;
+//const double momentum = 0.8;
 
 template<typename H, typename O>
 class neural_network {
@@ -29,9 +31,9 @@ public:
 		output = nullptr;
 		layers = new layer*[2];
 		weights = new double[weights_size];
-		deltas = new double[hl_num + ol_num];
+		deltas = new double[hl_num + 1 + ol_num];
 		layers[0] = new H(hl_num, in_num, 1, weights, deltas, 0);
-		layers[1] = new O(ol_num, hl_num, 1, weights + (in_num + 1) * hl_num, deltas + hl_num, 1); // bilo je deltas+hl_num+1
+		layers[1] = new O(ol_num, hl_num, 1, weights + (in_num + 1) * hl_num, deltas + hl_num + 1, 1);
 		std::random_device device;
 		std::default_random_engine engine(device());
 		std::uniform_real_distribution<double> distribution(min_ran, max_ran);
@@ -54,7 +56,7 @@ public:
 		return output;
 	}
 
-	void backPropagate(double p = 1) { //ovo p bi bio ocekivani izlaz
+	void backPropagate(double p = 1.0) { //ovo p bi bio ocekivani izlaz
 		layers[1]->compute_deltas(p);
 		layers[0]->compute_deltas();
 		layers[1]->update_weights();
