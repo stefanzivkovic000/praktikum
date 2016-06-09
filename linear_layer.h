@@ -4,13 +4,13 @@
 extern int nLayers;
 class linear_layer : public layer {
 private:
-	double activation_fn(double a) {
+	virtual double activation_fn(double a) {
 		return a;
 	}
-	double activation_fn_inverse(double x) {
+	virtual double activation_fn_inverse(double x) {
 		return x;
 	}
-	double activation_fn_prime(double a) {
+	virtual double activation_fn_prime(double a) {
 		return 1.0;
 	}
 

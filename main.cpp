@@ -3,10 +3,10 @@
 #include <string>
 int main() {
 
-	neural_network<tanhip_layer, tanhip_layer> neural_net(2, 2);
+	neural_network<sig_layer, sig_layer> neural_net(2, 20);
 	double *arr = new double[2];
 	srand(time(NULL));
-	for (int i = 1; i < 10001; i++) {
+	for (int i = 1; i < 100001; i++) {
 		arr[0] = rand() % 2;
 		arr[1] = rand() % 2;
 		double res = (int) arr[0] ^ (int) arr[1];
