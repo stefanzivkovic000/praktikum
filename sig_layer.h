@@ -9,9 +9,6 @@ private:
 	double activation_fn(double a) {
 		return 1.0 / (1.0 + exp(-a));
 	}
-	double activation_fn_inverse(double x) {
-		return log(x / (1 - x));
-	}
 	double activation_fn_prime(double a) {
 		return activation_fn(a) * (1.0 - activation_fn(a));
 	}

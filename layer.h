@@ -2,9 +2,9 @@
 
 #include <iostream>
 class layer;
-extern int nLayers;
+extern int n_layers;
 extern layer** layers;
-const double eta = 0.8;
+const double eta = 0.9;
 
 class layer {
 protected:
@@ -15,14 +15,13 @@ protected:
 	double* weights;  //pokazivac na pocetak njegovih tezina u globalnom nizu weights
 	double* potentials;   
 	double* output;
-	double* inputs; //dodao zbog backProp, treba za neke izvode
-	double* deltas;
+	double* inputs; //dodao zbog backProp, treba za jedan parcijalni izvod
+	double* deltas; //slicno kao za weights
 	virtual double activation_fn(double a) = 0;			//a je potencijal
-	virtual double activation_fn_inverse(double x) = 0;
 	virtual double activation_fn_prime(double a) = 0;	
-	double cost_fn(double x, double y) { //mse
+	/*double cost_fn(double x, double y) { //mse, ne koristi se ova fja
 		return (y-x)*(y-x);
-	}
+	}*/ 
 	double cost_fn_prime(double x, double y) {
 		return -2.0 * (y-x);
 	}
@@ -36,21 +35,21 @@ public:
 		this -> deltas = deltas;
 		this -> output = new double[nn];
 		this -> my_index = my_index;
-		potentials = new double[nn];
+		potentials = new double[nn]();
 	}
 
 	~layer() {
-		delete [] potentials;
+		delete[] potentials;
 		delete[] inputs;
-		delete [] output;
+		delete[] output;
 	}
 
-	virtual double d_ai_xj(int i, int j, double x) = 0;
-	virtual double d_ai_wij(int j) = 0; // za linearni sloj dovoljno
+	virtual double d_ai_xj(int i, int j) = 0; // za linearni sloj dovoljni argumenti
+	virtual double d_ai_wij(int j) = 0;
 
 	void compute_potentials(double *input) {		
-		inputs = new double[ni + bias];
-		for (int i = 0; i < ni + bias; i++)
+		inputs = new double[ni]; //bias je imaginaran :)
+		for (int i = 0; i < ni; i++)
 			inputs[i] = input[i]; 
 
 		for (int i = 0; i < nn; i++) {
@@ -82,28 +81,27 @@ public:
 	void update_weights() {
 		for (int i = 0; i < nn; i++) {
 			weights[i*(ni + bias)] -= (bias) ? eta * deltas[i] * 1 : 0.0; // update za bias ide ovako
-			for (int j = 0; j < ni + bias - 1; j++)
-				weights[i*(ni + bias) + j + bias] -= eta * deltas[i] * this->d_ai_wij(j);
-		} // nisam siguran da valja
+			for (int j = bias; j < ni + bias; j++)
+				weights[i*(ni + bias) + j] -= eta * deltas[i] * this->d_ai_wij(j-bias);
+		} 
+	}
+
+    void compute_deltas(double y=1.0) { //cisto onako =1, da poziv za skriveni sloj ne bi imao args
+		if (my_index == n_layers - 1) {
+			deltas[0] = cost_fn_prime(output[0],y)*this->activation_fn_prime(potentials[0]);
+			layers[my_index - 1]->compute_deltas();
+		}
+		else {
+			for (int i = 0; i < nn; i++) {
+				deltas[i] = deltas[nn] * layers[my_index+1]->d_ai_xj(0,i+1)*this->activation_fn_prime(potentials[i]); //
+			} // drugacije bi bilo da ima vise od 2 sloja
+		}
 	}
 
 	int get_nn() {
 		return nn;
 	}
-
-    void compute_deltas(double y=1.0) { //cisto onako =1, da poziv za skriveni sloj ne bi imao args
-		if (my_index == nLayers - 1) {
-			deltas[0] = cost_fn_prime(output[0],y)*this->activation_fn_prime(potentials[0]);
-		}
-		else {
-			if (bias)
-				deltas[0] = deltas[nn + 1]*1.0*this->activation_fn_prime(potentials[0]); // bias se updateuje ovako
-			for (int i = 0 + bias; i < nn + bias; i++) {
-				deltas[i] = deltas[nn + bias] * layers[my_index+1]->d_ai_xj(0,i,output[i])*this->activation_fn_prime(potentials[i]); //
-			} // drugacije bi bilo da ima vise od 2 sloja
-		}
-	}
-
+	
 	int get_ni() {
 		return ni;
 	}

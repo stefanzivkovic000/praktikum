@@ -7,9 +7,6 @@ private:
 	virtual double activation_fn(double a) {
 		return a;
 	}
-	virtual double activation_fn_inverse(double x) {
-		return x;
-	}
 	virtual double activation_fn_prime(double a) {
 		return 1.0;
 	}
@@ -17,7 +14,7 @@ private:
 public:
 	linear_layer(int nn, int ni, int bias, double* weights, double* deltas, int my_index) :
 		layer(nn, ni, bias, weights, deltas, my_index) { }
-	double d_ai_xj(int i, int j, double x) {
+	double d_ai_xj(int i, int j) {
 		return weights[i * (ni+bias) + j]; 
 	}
 	double d_ai_wij(int j) {

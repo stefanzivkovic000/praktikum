@@ -8,7 +8,7 @@
 
 const double min_ran = -0.1;
 const double max_ran = 0.1;
-int nLayers = 2; //ovde jer ih koristi klasa layer (extern)
+int n_layers = 2; //ovde jer ih koristi klasa layer (extern)
 layer** layers; //za backprop, trenutni sloj mora da zna tip sledeceg
 //const double learning_rate = ?;
 //const double momentum = ?;
@@ -16,21 +16,21 @@ layer** layers; //za backprop, trenutni sloj mora da zna tip sledeceg
 template<typename H, typename O>
 class neural_network {
 protected:
-	int tin, thl, tol;
+	int tin, thl, tol; //pamtio ove 3 vrednosti samo zbog print f-ja, testiranje
 	double* weights;		//tezine za celu mrezu
 	double* output;			//rezultat mreze, moze da bude niz, kod nas jedan double jer imamo jedan out neuron
 	double* deltas;			//delte za sve neurone
 public:
 	neural_network(int in_num, int hl_num, int ol_num = 1) {
-		tin = in_num;				//pamtio ove 3 vrednosti samo zbog print f-ja, testiranje
+		tin = in_num;				
 		thl = hl_num;
 		tol = ol_num;
 		output = nullptr;
 		initialize_weights((in_num + 1) * hl_num + (hl_num + 1) * ol_num);
-		initialize_deltas(hl_num + 1 + ol_num);
+		initialize_deltas(hl_num + ol_num);
 		layers = new layer*[2];
 		layers[0] = new H(hl_num, in_num, 1, weights, deltas, 0);
-		layers[1] = new O(ol_num, hl_num, 1, weights + (in_num + 1) * hl_num, deltas + hl_num + 1, 1);
+		layers[1] = new O(ol_num, hl_num, 1, weights + (in_num + 1) * hl_num, deltas + hl_num, 1);
 	}
 
 	virtual ~neural_network() {
@@ -52,7 +52,7 @@ public:
 	}
 
 	void initialize_deltas(int deltas_size) {
-		deltas = new double[deltas_size]();
+		deltas = new double[deltas_size];
 	}
 	
 	virtual double* compute_output(double *input) {     //da bi mogla da se predefinise
@@ -62,7 +62,6 @@ public:
 
 	void backPropagate(double p = 1.0) { //p je ocekivani izlaz za dati ulaz
 		layers[1]->compute_deltas(p);
-		layers[0]->compute_deltas();
 		layers[1]->update_weights();
 		layers[0]->update_weights();
 	}
