@@ -1,17 +1,14 @@
 #pragma once
 
 #include <iostream>
-class layer;
-extern int n_layers;
-extern layer** layers;
 const double eta = 0.9;
 
 class layer {
 protected:
-	int my_index;		//indeks sloja u mrezi - skriveni sloj - 0, izlazni sloj - 1
+	layer* next_layer;	//desni sloj, kao ga nema, onda je ovo output sloj
 	int nn;			//broj neurona u sloju
 	int ni;			//broj ulaza
-	bool bias;		//1 ako ima bias, 0 inace								
+	bool bias;		//1 ako ima bias, 0 inace. ovaj bias je prakticno neuron u prethodnom sloju, imaginaran je								
 	double* weights;  //pokazivac na pocetak njegovih tezina u globalnom nizu weights
 	double* potentials;   
 	double* output;
@@ -27,14 +24,14 @@ protected:
 	}
 	
 public:
-	layer(int nn, int ni, bool bias, double* weights, double* deltas, int my_index) {
+	layer(int nn, int ni, bool bias, double* weights, double* deltas, layer* next_layer=nullptr) {
 		this -> nn = nn;
 		this -> ni = ni;
 		this -> bias = bias;
 		this -> weights = weights;
 		this -> deltas = deltas;
 		this -> output = new double[nn];
-		this -> my_index = my_index;
+		this -> next_layer = next_layer;
 		potentials = new double[nn]();
 	}
 
@@ -87,13 +84,12 @@ public:
 	}
 
     void compute_deltas(double y=1.0) { //cisto onako =1, da poziv za skriveni sloj ne bi imao args
-		if (my_index == n_layers - 1) {
+		if (!next_layer) {
 			deltas[0] = cost_fn_prime(output[0],y)*this->activation_fn_prime(potentials[0]);
-			layers[my_index - 1]->compute_deltas();
 		}
 		else {
 			for (int i = 0; i < nn; i++) {
-				deltas[i] = deltas[nn] * layers[my_index+1]->d_ai_xj(0,i+1)*this->activation_fn_prime(potentials[i]); //
+				deltas[i] = deltas[nn] * next_layer->d_ai_xj(0,i+1)*this->activation_fn_prime(potentials[i]); //
 			} // drugacije bi bilo da ima vise od 2 sloja
 		}
 	}

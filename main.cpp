@@ -3,27 +3,28 @@
 #include <string>
 
 int main() {
-	neural_network < tanhip_layer, sig_layer > neural_net(1, 20);
-	double *arr = new double[1];
+	neural_network < tanhip_layer, sig_layer > neural_net(2, 10);
+	double *arr = new double[2];
 	srand(time(NULL));
-	for (int i = 1; i < 1001; i++) {
-		arr[0] = ((double)rand() / (double)RAND_MAX); // (0, 1)
-		double res = sin(arr[0]);
-		std::cout << "PASS: " << i << "; IN: " << arr[0] << 
-			"; expRES: " << res << "; netOUT: " <<
-			neural_net.compute_output(arr)[0] << std::endl;
-		neural_net.backPropagate(res);
+	for (int i = 1; i < 10001; i++) {
+		arr[0] = rand() % 2;
+		arr[1] = rand() % 2;
+		double res = (int)arr[0] ^ (int)arr[1];
+		std::cout << "PASS: " << i << "; IN: " << arr[0] <<
+			", " << arr[1] << "; expOUT: " << res << "; netOUT: " <<
+			neural_net.train_network_pass(arr, res)[0] << std::endl;
 		std::cout << std::endl;
 	}
 	neural_net.printWeights();
 	std::string input;
 	while (getline(std::cin, input) && input[0] != '\0'){
-		arr[0] = stod(input);
-		double res = sin(arr[0]);
-		std::cout  <<"IN: " << arr[0] <<
-			 "; expRES: " << res << "; netOUT: " <<
-			neural_net.compute_output(arr)[0] << std::endl;
-		neural_net.backPropagate(res); 
+		arr[0] = input[0] - '0';
+		arr[1] = input[1] - '0';
+		double res = (int)arr[0] ^ (int)arr[1];
+		std::cout <<"IN: " << arr[0] <<
+			", " << arr[1] << "; expOUT: " << res << "; netOUT: " <<
+			neural_net.train_network_pass(arr, res)[0] << std::endl; 
 		std::cout << std::endl;
 	}
+	delete[] arr;
 }

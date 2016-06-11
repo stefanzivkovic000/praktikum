@@ -14,6 +14,6 @@ private:
 	}
 	
 public:
-	sig_layer(int nn, int ni, int bias, double* weights, double* deltas, int my_index) :
-		linear_layer(nn, ni, bias, weights, deltas, my_index) { }
+	sig_layer(int nn, int ni, int bias, double* weights, double* deltas, layer* next_layer=nullptr) :
+		linear_layer(nn, ni, bias, weights, deltas, next_layer) { }
 };
